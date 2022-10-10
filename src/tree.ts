@@ -41,7 +41,7 @@ const Node = (operator: any, value: any, left: any, right: any) => {
     };
 };
 
-const tree = Node(
+export const tree = Node(
     "÷",
     null,
     Node(
