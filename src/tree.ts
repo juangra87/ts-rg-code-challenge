@@ -1,33 +1,33 @@
-import { strictEqual } from 'assert';
+enum Operator {
+    PLUS = "+",
+    MINUS = "-",
+    MULTIPLY = "x",
+    DIVISION = "÷",
+    NONE = ""
+}
 
-const Node = (operator: any, value: any, left: any, right: any) => {
+const Node = (operator: Operator, value: any, left: any, right: any) => {
     const result = function () {
         switch (operator) {
-            case "+":
+            case Operator.PLUS:
                 return left.result() + right.result();
-            case "-":
+            case Operator.MINUS:
                 return left.result() - right.result();
-            case "x":
+            case Operator.MULTIPLY:
                 return left.result() * right.result();
-            case "÷":
+            case Operator.DIVISION:
                 return left.result() / right.result();
-            default:
+            case Operator.NONE:
                 return value;
         }
     };
 
     const toString = function () {
         switch (operator) {
-            case "+":
-                return `(${left.toString()} + ${right.toString()})`;
-            case "-":
-                return `(${left.toString()} - ${right.toString()})`;
-            case "x":
-                return `(${left.toString()} x ${right.toString()})`;
-            case "÷":
-                return `(${left.toString()} ÷ ${right.toString()})`;
-            default:
+            case Operator.NONE:
                 return value.toString();
+            default :
+                return `(${left.toString()} ${operator} ${right.toString()})`;
         }
     };
 
@@ -42,21 +42,17 @@ const Node = (operator: any, value: any, left: any, right: any) => {
 };
 
 export const tree = Node(
-    "÷",
+    Operator.DIVISION,
     null,
     Node(
-        "+",
+        Operator.PLUS,
         null,
-        Node("", 7, null, null),
+        Node(Operator.NONE, 7, null, null),
         Node(
-            "x",
-            null,
-            Node("-", null, Node("", 3, null, null), Node("", 2, null, null)),
-            Node("", 5, null, null)
+            Operator.MULTIPLY, null,
+            Node(Operator.MINUS, null, Node(Operator.NONE, 3, null, null), Node(Operator.NONE, 2, null, null)),
+            Node(Operator.NONE, 5, null, null)
         )
     ),
-    Node("", 6, null, null)
+    Node(Operator.NONE, 6, null, null)
 );
-
-strictEqual("((7 + ((3 - 2) x 5)) ÷ 6)", tree.toString());
-strictEqual(2, tree.result());
