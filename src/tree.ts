@@ -1,78 +1,77 @@
-type OperatorMetadata ={
-    id: string
-    apply(values: Array<Operation>)
-    numOfParameters: number
+type BasicTypesOfParameters = Operation | number
+type OperandTypes = [BasicTypesOfParameters, BasicTypesOfParameters] | number
+
+interface Operation {
+    operands: OperandTypes
+    result(): number
+    toString(): string
 }
 
-const Operators = {
-    PLUS: {
-        id: "+",
-        apply: (values: Array<Operation>) => values[0].result() + values[1].result(),
-        numOfParameters: 2
-    },
-    MINUS: {
-        id: "-",
-        apply: (values: Array<Operation>) => values[0].result() - values[1].result(),
-        numOfParameters: 2
-    },
-    MULTIPLICATION: {
-        id: "x",
-        apply: (values: Array<Operation>) => values[0].result() * values[1].result(),
-        numOfParameters: 2
-    },
-    DIVISION: {
-        id: "÷",
-        apply: (values: Array<Operation>) => values[0].result() / values[1].result(),
-        numOfParameters: 2
-    },
-    SINGLE_VALUE: {
-        id: "",
-        apply: (values: Array<Operation>) => values[0],
-        numOfParameters: 1
+const getOperandValue = function(parameter: Operation| number ):number {
+    if(typeof parameter === 'number'){
+        return parameter
+    }else{
+        return parameter.result();
     }
 }
 
-interface Operation {
-    values: Array<Operation> | number;
-
-    toString(): string;
-
-    result(): number;
+type OperatorMetadata = {
+    sign: string
+    apply(operands: OperandTypes)
 }
 
-const Node = (operator: OperatorMetadata, values: Array<Operation> | number) => {
+export const Operator = {
+    PLUS:  {
+        sign: "+",
+        apply: (operands: OperandTypes) => getOperandValue(operands[0]) + getOperandValue(operands[1])
+    },
+    MINUS: {
+        sign: "-",
+        apply: (operands: OperandTypes) => getOperandValue(operands[0]) - getOperandValue(operands[1]),
+    },
+    MULTIPLICATION: {
+        sign: "x",
+        apply: (operands: OperandTypes) => getOperandValue(operands[0]) * getOperandValue(operands[1]),
+    },
+    DIVISION: {
+        sign: "÷",
+        apply: (operands: OperandTypes) => getOperandValue(operands[0]) / getOperandValue(operands[1]),
+    }
+}
+
+
+export const Node = (operator: OperatorMetadata, operands: OperandTypes) => {
 
     const result = function (): number {
-        if (operator === Operators.SINGLE_VALUE && typeof values === 'number') {
-            return values
+        if (typeof operands === 'number') {
+            return operands
         } else {
-            return operator.apply(this.values)
+            return operator.apply(operands)
         }
     }
 
     const toString = function (): string {
-        if (operator === Operators.SINGLE_VALUE) {
-            return values.toString()
+        if (typeof operands === 'number') {
+            return operands.toString()
         } else {
-            return `(${values[0].toString()} ${(operator.id)} ${values[1].toString()})`;
+            return `(${operands[0].toString()} ${(operator.sign)} ${operands[1].toString()})`;
         }
     }
 
-    return {result, toString, values}
+    return {result, toString, operands}
 }
 
 export const tree =
-    Node(Operators.DIVISION, [
-        Node(Operators.PLUS, [
-            Node(Operators.SINGLE_VALUE, 7),
-            Node(Operators.MULTIPLICATION, [
-                Node(Operators.MINUS, [
-                    Node(Operators.SINGLE_VALUE, 3),
-                    Node(Operators.SINGLE_VALUE, 2)
-                ]),
-                Node(Operators.SINGLE_VALUE, 5)
+    Node(Operator.DIVISION, [
+        Node(Operator.PLUS, [
+            7,
+            Node(Operator.MULTIPLICATION, [
+                Node(Operator.MINUS, [
+                    3,
+                    2]),
+                5
             ])
         ]),
-        Node(Operators.SINGLE_VALUE, 6)
+        6
     ]);
 

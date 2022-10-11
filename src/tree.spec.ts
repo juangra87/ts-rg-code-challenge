@@ -1,4 +1,4 @@
-import {tree} from "./tree";
+import {Node, tree, Operator} from "./tree";
 import {strictEqual} from "assert";
 
 describe('tests for compliance', () => {
@@ -8,5 +8,16 @@ describe('tests for compliance', () => {
 
     it('result is fine', () => {
         strictEqual(2, tree.result());
+    })
+})
+
+describe('test input parameters and representation', () =>{
+    it('negative values are allowed', () => {
+        strictEqual(Node(Operator.PLUS, [2,-1]).result(), 1)
+        strictEqual(Node(Operator.PLUS, [2,-1]).toString(),"(2 + -1)")
+    })
+    it('float values are allowed', () => {
+        strictEqual(Node(Operator.MINUS, [5.55,3.33]).result(),2.22)
+        strictEqual(Node(Operator.MINUS, [5.55,3.33]).toString(), "(5.55 - 3.33)")
     })
 })
